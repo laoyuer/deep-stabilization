@@ -68,7 +68,7 @@ def run(loader, cf, USE_CUDA=True):
 def inference(cf, data_path, USE_CUDA):
     print("-----------Load Dataset----------")
     test_loader = get_inference_data_loader(cf, data_path)
-    data = test_loader.dataset.data[0]
+    data = test_loader.dataset.data[0]#获取配置数据及各种meta数据。meta数据存放在data字段中
     test_loader.dataset.no_flo = True
     test_loader.dataset.static_options = get_static(ratio = 0)
 
@@ -88,8 +88,11 @@ def inference(cf, data_path, USE_CUDA):
     virtual_path = os.path.join("./test", cf['data']['exp'], video_name+'.txt')
 
     print("------Start Visual Result--------")
+    # 根据采集的meta数据，计算每个帧时间戳点上的旋转轴及OIS数据
     rotations_real, lens_offsets_real = get_rotations(data.frame[:data.length], data.gyro, data.ois, data.length)
     fig_path = os.path.join(data_path, video_name+"_real.jpg")
+    # rotations_real:帧时间戳上的旋转轴; rotations_virtual:网络处理后得到的平滑后的x,y,z数据; rotations_virtual2:待确认
+    # lens_offsets_real: 帧时间戳上的实际OIS的x,y数据; lens_offsets_virtual: 处理之后的OIS的x,y数据(均为0); lens_offsets_virtual2:待确认
     visual_rotation(rotations_real, lens_offsets_real, None, None, None, None, fig_path)
 
     # print("------Start Warping Video--------")
